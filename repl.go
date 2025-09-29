@@ -24,6 +24,11 @@ func startRepl() {
 
 			command := words[0]
 
-			fmt.Println("Your command was:", command)
+			cmd, ok := supportedCommands[command]
+			if !ok {
+				fmt.Println("Unknown command")
+			}
+
+			cmd.callback(&config)
 		}
 }
