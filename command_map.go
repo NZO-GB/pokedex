@@ -1,43 +1,11 @@
 package main
 
-import (
-	"encoding/json"
+import(
 	"fmt"
 	"io"
 	"net/http"
-	"os"
+	"encoding/json"
 )
-
-var supportedCommands map[string]cliCommand
-
-func init() {
-	supportedCommands = map[string]cliCommand{
-		"exit": {name: "exit", description: "Exit the Pokedex", callback: commandExit},
-		"help": {name: "help", description: "Displays a help message", callback: commandHelp},
-		"map":  {name: "map", description: "Presents the list of the next 20 location-areas", callback: commandMap},
-		"mapb": {name: "mapb", description: "Presents the list of the previous 20 location-areas", callback: commandMapb},
-	}
-}
-
-type cliCommand struct {
-	name        string
-	description string
-	callback    func(*configStruct) error
-}
-
-func commandExit(config *configStruct) error {
-	fmt.Println("Closing the Pokedex... Goodbye!")
-	os.Exit(0)
-	return nil
-}
-
-func commandHelp(config *configStruct) error {
-	fmt.Println("Welcome to the Pokedex!\nUsage:")
-	for command, information := range supportedCommands {
-		fmt.Printf("%s: %s", command, information.description)
-	}
-	return nil
-}
 
 func commandMap(config *configStruct) error {
 	if config.mapCall.next == "" {

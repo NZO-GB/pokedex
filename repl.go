@@ -7,6 +7,17 @@ import (
 	"strings"
 )
 
+var supportedCommands map[string]cliCommand
+
+func init() {
+	supportedCommands = map[string]cliCommand{
+		"exit": {name: "exit", description: "Exit the Pokedex", callback: commandExit},
+		"help": {name: "help", description: "Displays a help message", callback: commandHelp},
+		"map":  {name: "map", description: "Presents the list of the next 20 location-areas", callback: commandMap},
+		"mapb": {name: "mapb", description: "Presents the list of the previous 20 location-areas", callback: commandMapb},
+	}
+}
+
 func cleanInput(text string) []string {
 	return strings.Fields(strings.ToLower(text))
 }

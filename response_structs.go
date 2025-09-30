@@ -19,3 +19,10 @@ type mapStruct struct {
 		URL  string `json:"url"`
 	} `json:"results"`
 }
+
+type cliCommand struct {
+	name        string
+	description string
+	callback    func(*configStruct) error
+}
+
