@@ -38,8 +38,9 @@ func startRepl() {
 			cmd, ok := supportedCommands[command]
 			if !ok {
 				fmt.Println("Unknown command")
+				continue
 			}
 
-			cmd.callback(&config)
+			cmd.callback(&cfg)
 		}
 }

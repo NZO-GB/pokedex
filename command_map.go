@@ -1,28 +1,43 @@
 package main
 
-import(
+import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"encoding/json"
 )
 
-func commandMap(config *configStruct) error {
-	if config.mapCall.next == "" {
-		return commandMapHelper("https://pokeapi.co/api/v2/location-area/", true)
+func commandMap(cfg *configStruct) error {
+
+	var call string
+
+	if cfg.mapCall.next == "" {
+		call = "https://pokeapi.co/api/v2/location-area/"
+	} else {
+		call = cfg.mapCall.next
 	}
-	return commandMapHelper(config.mapCall.next, true)
+	if data, ok := cfg.cache.Get(call); ok {
+		return commandMapPrinter(data, call, cfg, true)
+	}
+
+	return commandMapGetter(call, cfg, true)
 }
 
-func commandMapb(config *configStruct) error {
-	if config.mapCall.prev == "" || config.mapCall.prev == "https://pokeapi.co/api/v2/location-area/?offset=0&limit=20" {
-	fmt.Println("you're on the first page")
+func commandMapb(cfg *configStruct) error {
+	if cfg.mapCall.prev == "" {
+		fmt.Println("you're on the first page")
 		return nil
 	}
-	return commandMapHelper(config.mapCall.prev, false)
+
+	if data, ok := cfg.cache.Get(cfg.mapCall.prev); ok {
+		return commandMapPrinter(data, cfg.mapCall.prev, cfg, true)
+	}
+
+	return commandMapGetter(cfg.mapCall.prev, cfg, false)
 }
 
-func commandMapHelper(call string, forward bool) error {
+func commandMapGetter(call string, cfg *configStruct, forward bool) error {
+
 	res, err := http.Get(call)
 	if err != nil {
 		fmt.Printf("(Get) encountered error:\n, %s", err)
@@ -36,6 +51,15 @@ func commandMapHelper(call string, forward bool) error {
 		return err
 	}
 
+	commandMapPrinter(data, call, cfg, forward)
+
+	return nil
+}
+
+func commandMapPrinter(data []byte, call string, cfg *configStruct, forward bool) error {
+
+	cfg.cache.Add(call, data)
+
 	var jsStruct mapStruct
 	if err := json.Unmarshal(data, &jsStruct); err != nil {
 		fmt.Printf("(Unmarshal) encountered error:\n, %s", err)
@@ -47,12 +71,14 @@ func commandMapHelper(call string, forward bool) error {
 	}
 
 	if forward {
-		config.mapCall.prev = call
-		config.mapCall.next = *jsStruct.Next
+		cfg.mapCall.prev = call
+		cfg.mapCall.next = *jsStruct.Next
 	} else {
-		config.mapCall.prev = *jsStruct.Previous
-		config.mapCall.next = call
+		fmt.Printf("Setting prev as: %s\t Setting next as: %s\n", *jsStruct.Previous, call)
+		cfg.mapCall.prev = *jsStruct.Previous
+		cfg.mapCall.next = call
 	}
 
 	return nil
+
 }

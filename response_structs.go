@@ -1,5 +1,7 @@
 package main
 
+import pokecache "github.com/NZO-GB/pokedex/internal/cache"
+
 type mapCall struct {
 	next string
 	prev string
@@ -7,7 +9,7 @@ type mapCall struct {
 
 type configStruct struct {
 	mapCall mapCall
-	mapFull mapStruct
+	cache pokecache.Cache
 }
 
 type mapStruct struct {
