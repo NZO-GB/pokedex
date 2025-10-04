@@ -7,78 +7,99 @@ import (
 	"net/http"
 )
 
-func commandMap(cfg *configStruct) error {
-
+func callGetter(cfg *configStruct, forward bool) (string, bool) {
 	var call string
+	switch forward {
+	case true:
+		if cfg.mapCall.next == nil {
+			fmt.Println("you're on the last page")
+			return "", false
+	 	}else {
+			call = *cfg.mapCall.next
+		}
+	case false:
+		if cfg.mapCall.prev == nil {
+			fmt.Println("you're on the first page")
+			return "", false
+		}else {
+			call = *cfg.mapCall.prev
+		}
+	}
+	return call, true
+}
 
-	if cfg.mapCall.next == "" {
-		call = "https://pokeapi.co/api/v2/location-area/"
+func commandMap(cfg *configStruct) error {
+	call, proceed := callGetter(cfg, true)
+	if proceed {
+		fmt.Printf("Got call %s \n", call)
 	} else {
-		call = cfg.mapCall.next
+		return nil
 	}
 	if data, ok := cfg.cache.Get(call); ok {
-		return commandMapPrinter(data, call, cfg, true)
+		fmt.Println("Got cache")
+		return mapPrinter(data, call, cfg)
 	}
 
-	return commandMapGetter(call, cfg, true)
+	return mapGetter(call, cfg)
 }
 
 func commandMapb(cfg *configStruct) error {
-	if cfg.mapCall.prev == "" {
-		fmt.Println("you're on the first page")
+	call, proceed := callGetter(cfg, false)
+	if proceed {
+		fmt.Printf("Got call %s \n", call)
+	} else {
 		return nil
 	}
-
-	if data, ok := cfg.cache.Get(cfg.mapCall.prev); ok {
-		return commandMapPrinter(data, cfg.mapCall.prev, cfg, true)
-	}
-
-	return commandMapGetter(cfg.mapCall.prev, cfg, false)
+	if data, ok := cfg.cache.Get(call); ok {
+		fmt.Println("Got cache")
+		return mapPrinter(data, call, cfg)
+	} 
+	return mapGetter(call, cfg)
 }
 
-func commandMapGetter(call string, cfg *configStruct, forward bool) error {
+func mapGetter(call string, cfg *configStruct) error {
 
-	res, err := http.Get(call)
+	fmt.Println("Executing mapGetter")
+
+	req, err := http.NewRequest("GET", call, nil)
 	if err != nil {
-		fmt.Printf("(Get) encountered error:\n, %s", err)
-		return err
+		return fmt.Errorf("NewReq found: %s", err)
+	}
+
+	res, err := cfg.pokeClient.HTTPClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("ClientDo found: %s", err)
 	}
 	defer res.Body.Close()
 
 	data, err := io.ReadAll(res.Body)
 	if err != nil {
-		fmt.Printf("(ReadAll) encountered error:\n, %s", err)
-		return err
+		return fmt.Errorf("(ReadAll) encountered error:\n, %s", err)
 	}
 
-	commandMapPrinter(data, call, cfg, forward)
+	mapPrinter(data, call, cfg)
 
 	return nil
 }
 
-func commandMapPrinter(data []byte, call string, cfg *configStruct, forward bool) error {
+func mapPrinter(data []byte, call string, cfg *configStruct) error {
+
+	fmt.Println("MapPrinter called")
 
 	cfg.cache.Add(call, data)
 
 	var jsStruct mapStruct
 	if err := json.Unmarshal(data, &jsStruct); err != nil {
-		fmt.Printf("(Unmarshal) encountered error:\n, %s", err)
-		return err
+		return fmt.Errorf("(Unmarshal) encountered error:\n, %s", err)
 	}
 
 	for _, location := range jsStruct.Results {
 		fmt.Println(location.Name)
 	}
+		fmt.Printf("Setting prev as: %s\t Setting next as: %s\n", &jsStruct.Previous, &jsStruct.Next)
+		cfg.mapCall.prev = jsStruct.Previous
+		cfg.mapCall.next = jsStruct.Next
 
-	if forward {
-		cfg.mapCall.prev = call
-		cfg.mapCall.next = *jsStruct.Next
-	} else {
-		fmt.Printf("Setting prev as: %s\t Setting next as: %s\n", *jsStruct.Previous, call)
-		cfg.mapCall.prev = *jsStruct.Previous
-		cfg.mapCall.next = call
-	}
-
-	return nil
+	return nil	
 
 }

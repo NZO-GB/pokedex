@@ -1,14 +1,17 @@
 package main
 
 import (
+	"github.com/NZO-GB/pokedex/internal/pokeapi"
 	"github.com/NZO-GB/pokedex/internal/cache"
 	"time"
 )
 
-var cfg configStruct
-
 func main() {
-	cfg.cache = pokecache.NewCache(10 * time.Second)
-	startRepl()
 	
+	var cfg configStruct
+	pokeClient := pokeapi.NewClient(5 * time.Second)
+	cfg.pokeClient = &pokeClient
+	cfg.cache = pokecache.NewCache(10 * time.Second)
+	cfg.mapCall.next = &locationURL
+	startRepl(&cfg)
 }

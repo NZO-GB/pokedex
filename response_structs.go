@@ -1,15 +1,11 @@
 package main
 
-import pokecache "github.com/NZO-GB/pokedex/internal/cache"
+var locationURL = "https://pokeapi.co/api/v2/location-area/"
+
 
 type mapCall struct {
-	next string
-	prev string
-}
-
-type configStruct struct {
-	mapCall mapCall
-	cache pokecache.Cache
+	next *string
+	prev *string
 }
 
 type mapStruct struct {
