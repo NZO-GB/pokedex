@@ -46,13 +46,16 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 }
 
 func (c *Cache) reapLoop() {
-	ticker := time.NewTicker(10 * time.Second)
+	ticker := time.NewTicker(c.interval)
 	defer ticker.Stop()
 
 	for range ticker.C {
 		c.mux.Lock()
-		for key := range c.entryMap {
-			delete(c.entryMap, key)
+		for key, value := range c.entryMap {
+			if value.createdAt.Before(time.Now().Add(- c.interval)) {
+				delete(c.entryMap, key)
+			}
+			
 		}
 		c.mux.Unlock()
 	}

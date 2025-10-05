@@ -34,14 +34,14 @@ func startRepl(cfg *configStruct) {
 	scanner := bufio.NewScanner(os.Stdin)
 		for {
 			fmt.Print("Pokedex > ")
-		if !scanner.Scan() {
-			if err := scanner.Err(); err != nil {
-				fmt.Println("Error reading input:", err)
-			} else {
-				fmt.Println("EOF, exiting REPL")
+			if !scanner.Scan() {
+				if err := scanner.Err(); err != nil {
+					fmt.Println("Error reading input:", err)
+				} else {
+					fmt.Println("EOF, exiting REPL")
+				}
+				return
 			}
-			return
-		}
 
 			words := cleanInput(scanner.Text())
 			if len(words) == 0 {

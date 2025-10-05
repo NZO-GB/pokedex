@@ -96,7 +96,6 @@ func mapPrinter(data []byte, call string, cfg *configStruct) error {
 	for _, location := range jsStruct.Results {
 		fmt.Println(location.Name)
 	}
-		fmt.Printf("Setting prev as: %s\t Setting next as: %s\n", &jsStruct.Previous, &jsStruct.Next)
 		cfg.mapCall.prev = jsStruct.Previous
 		cfg.mapCall.next = jsStruct.Next
 
