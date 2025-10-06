@@ -9,16 +9,6 @@ import (
 	"github.com/NZO-GB/pokedex/internal/pokeapi"
 )
 
-var supportedCommands map[string]cliCommand
-
-func init() {
-	supportedCommands = map[string]cliCommand{
-		"exit": {name: "exit", description: "Exit the Pokedex", callback: commandExit},
-		"help": {name: "help", description: "Displays a help message", callback: commandHelp},
-		"map":  {name: "map", description: "Presents the list of the next 20 location-areas", callback: commandMap},
-		"mapb": {name: "mapb", description: "Presents the list of the previous 20 location-areas", callback: commandMapb},
-	}
-}
 
 type configStruct struct {
 	mapCall mapCall
@@ -49,11 +39,19 @@ func startRepl(cfg *configStruct) {
 			}
 
 			command := words[0]
+			var argument string
+			if len(words) == 2 {
+				argument = words[1]
+			} else if len(words) > 2 {
+				fmt.Println("Too many arguments")
+				continue
+			}
+
 
 			cmd, exists := supportedCommands[command]
 			if exists {
 				fmt.Printf("Executing %s \n", command)
-				if err := cmd.callback(cfg); err != nil{
+				if err := cmd.callback(cfg, argument); err != nil{
 					fmt.Println(err)
 				}
 			} else {

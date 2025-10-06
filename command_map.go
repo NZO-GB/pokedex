@@ -28,7 +28,7 @@ func callGetter(cfg *configStruct, forward bool) (string, bool) {
 	return call, true
 }
 
-func commandMap(cfg *configStruct) error {
+func commandMap(cfg *configStruct, _ string) error {
 	call, proceed := callGetter(cfg, true)
 	if proceed {
 		fmt.Printf("Got call %s \n", call)
@@ -43,7 +43,7 @@ func commandMap(cfg *configStruct) error {
 	return mapGetter(call, cfg)
 }
 
-func commandMapb(cfg *configStruct) error {
+func commandMapb(cfg *configStruct, _ string) error {
 	call, proceed := callGetter(cfg, false)
 	if proceed {
 		fmt.Printf("Got call %s \n", call)
@@ -58,8 +58,6 @@ func commandMapb(cfg *configStruct) error {
 }
 
 func mapGetter(call string, cfg *configStruct) error {
-
-	fmt.Println("Executing mapGetter")
 
 	req, err := http.NewRequest("GET", call, nil)
 	if err != nil {
@@ -77,14 +75,10 @@ func mapGetter(call string, cfg *configStruct) error {
 		return fmt.Errorf("(ReadAll) encountered error:\n, %s", err)
 	}
 
-	mapPrinter(data, call, cfg)
-
-	return nil
+	return mapPrinter(data, call, cfg)
 }
 
 func mapPrinter(data []byte, call string, cfg *configStruct) error {
-
-	fmt.Println("MapPrinter called")
 
 	cfg.cache.Add(call, data)
 
