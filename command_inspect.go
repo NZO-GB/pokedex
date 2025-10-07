@@ -34,7 +34,7 @@ func pokemonStats(pokemon *pokemonStruct) error {
 	for _, t := range(pokemon.Types) {
 		fmt.Println(" - ", t.Type.Name)
 	}
-
+	
 	return nil
 
 }

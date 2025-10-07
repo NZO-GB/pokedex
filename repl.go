@@ -51,7 +51,6 @@ func startRepl(cfg *configStruct) {
 
 			cmd, exists := supportedCommands[command]
 			if exists {
-				fmt.Printf("Executing %s \n", command)
 				if err := cmd.callback(cfg, argument); err != nil{
 					fmt.Println(err)
 				}

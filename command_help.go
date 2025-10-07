@@ -13,6 +13,7 @@ func init() {
 		"explore": 	{name: "explore", description: "Presents the pokemon present in an given area", callback: commandExplore},
 		"catch":	{name: "catch", description: "Attempts to catch a pokemon to add it to pokedex", callback: commandCatch},
 		"inspect":	{name: "inspect", description: "Inspects pokemon in your pokedex", callback: commandInspect},
+		"pokedex":	{name: "pokedex", description: "Presents a list with the pokemon in oyur pokedex", callback: commandPokedex},
 	}
 }
 
@@ -20,7 +21,7 @@ func init() {
 func commandHelp(_ *configStruct, _ string) error {
 	fmt.Println("Welcome to the Pokedex!\n\nUsage:")
 	for command, information := range supportedCommands {
-		fmt.Printf("%s:\t\t%s\n", command, information.description)
+		fmt.Printf("%s:\t%s\n", command, information.description)
 	}
 	return nil
 }
