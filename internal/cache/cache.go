@@ -23,7 +23,6 @@ func NewCache(interval time.Duration) Cache {
 		mux:		&sync.Mutex{},
 	}
 	go cache.reapLoop()
-	fmt.Println("Created new cache")
 	return cache
 }
 

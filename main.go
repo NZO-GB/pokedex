@@ -13,5 +13,6 @@ func main() {
 	cfg.pokeClient = &pokeClient
 	cfg.cache = pokecache.NewCache(10 * time.Second)
 	cfg.mapCall.next = &locationURL
+	cfg.pokedex = make(map[string]pokemonStruct)
 	startRepl(&cfg)
 }

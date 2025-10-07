@@ -12,6 +12,7 @@ import (
 
 type configStruct struct {
 	mapCall mapCall
+	pokedex map[string]pokemonStruct
 	cache pokecache.Cache
 	pokeClient *pokeapi.Client
 }
