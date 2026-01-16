@@ -15,25 +15,25 @@ func commandExplore(cfg *configStruct, area string) error {
 	if data, ok := cfg.cache.Get(areaURL); ok {
 		return areaPrinter(cfg, data, areaURL)
 	} else {
-		return areaGetter(cfg, areaURL)
+		return areaGetRequester(cfg, areaURL)
 	}
 }
 
-func areaGetter(cfg *configStruct, areaURL string) error {
+func areaGetRequester(cfg *configStruct, areaURL string) error {
 
 	req, err := http.NewRequest("GET", areaURL, nil)
 	if err != nil {
-		return fmt.Errorf("area NewReq found: %s", err)
+		return fmt.Errorf("area NewReq found: %w", err)
 	} 
 
 	res, err := cfg.pokeClient.HTTPClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("area ClientDo found: %s", err)
+		return fmt.Errorf("area ClientDo found: %w", err)
 	}
 
 	data, err := io.ReadAll(res.Body)
 	if err != nil {
-		return fmt.Errorf("area ReadAll found: %s", err)
+		return fmt.Errorf("area ReadAll found: %w", err)
 	}
 
 	return areaPrinter(cfg, data, areaURL)
@@ -45,7 +45,7 @@ func areaPrinter(cfg *configStruct, data []byte, call string) error {
 
 	var jsStruct areaStruct
 	if err := json.Unmarshal(data, &jsStruct); err != nil {
-		return fmt.Errorf("area Unmarshal found: %s", err)
+		return fmt.Errorf("area Unmarshal found: %w", err)
 	}
 
 	fmt.Println("Found Pokémon:")

@@ -31,7 +31,7 @@ func callGetter(cfg *configStruct, forward bool) (string, bool) {
 func commandMap(cfg *configStruct, _ string) error {
 	call, proceed := callGetter(cfg, true)
 	if proceed {
-		fmt.Printf("Got call %s \n", call)
+		fmt.Printf("Got call %w \n", call)
 	} else {
 		return nil
 	}
@@ -61,18 +61,18 @@ func mapGetter(call string, cfg *configStruct) error {
 
 	req, err := http.NewRequest("GET", call, nil)
 	if err != nil {
-		return fmt.Errorf("NewReq found: %s", err)
+		return fmt.Errorf("NewReq found: %w", err)
 	}
 
 	res, err := cfg.pokeClient.HTTPClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("ClientDo found: %s", err)
+		return fmt.Errorf("ClientDo found: %w", err)
 	}
 	defer res.Body.Close()
 
 	data, err := io.ReadAll(res.Body)
 	if err != nil {
-		return fmt.Errorf("(ReadAll) encountered error:\n, %s", err)
+		return fmt.Errorf("(ReadAll) encountered error:\n, %w", err)
 	}
 
 	return mapPrinter(data, call, cfg)
@@ -84,7 +84,7 @@ func mapPrinter(data []byte, call string, cfg *configStruct) error {
 
 	var jsStruct mapStruct
 	if err := json.Unmarshal(data, &jsStruct); err != nil {
-		return fmt.Errorf("(Unmarshal) encountered error:\n, %s", err)
+		return fmt.Errorf("(Unmarshal) encountered error:\n, %w", err)
 	}
 
 	for _, location := range jsStruct.Results {

@@ -18,18 +18,18 @@ func commandCatch(cfg *configStruct, pokemon string) error {
 
 	req, err := http.NewRequest("GET", call, nil)
 	if err != nil {
-		return fmt.Errorf("NewReq found: %s", err)
+		return fmt.Errorf("NewReq found: %w", err)
 	}
 
 	res, err := cfg.pokeClient.HTTPClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("ClientDo found: %s", err)
+		return fmt.Errorf("ClientDo found: %w", err)
 	}
 	defer res.Body.Close()
 
 	data, err := io.ReadAll(res.Body)
 	if err != nil {
-		return fmt.Errorf("ReadAll found: %s", err)
+		return fmt.Errorf("ReadAll found: %w", err)
 	}
 
 	var jsStruct pokemonStruct
@@ -39,7 +39,7 @@ func commandCatch(cfg *configStruct, pokemon string) error {
 		return fmt.Errorf("pokemon not found")
 	}
 
-	fmt.Printf("Throwing a Pokeball at %s...\n", pokemon)
+	fmt.Printf("Throwing a Pokeball at %w...\n", pokemon)
 
 	catchPokemon(cfg, &jsStruct)
 
